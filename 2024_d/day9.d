@@ -31,64 +31,63 @@ void main()
 		.array
 		.join; // result is a long[]
 
-	// Make newarr a string so we can append string data to it.
 	auto newarr = "";
 	auto id = 0;
 
 	bool swaped = false;
 	foreach (k, value; result)
 	{
-		if (swaped)
+		if (k % 2 == 0)
 		{
 			if (value != 0)
 			{
-				// Convert the repeat range to a string with .array
 				newarr ~= ".".repeat(cast(size_t) value).array.join;
 			}
-			swaped = false;
 		}
-		else
+		else if (value != 0)
 		{
-			if (value != 0)
-			{
-				// If you want to print the digit itself, use `value`:
-				// newarr ~= to!string(value).repeat(cast(size_t) value).array;
-
-				// If you want to print the index `k`, use this:
-				newarr ~= to!string(id).repeat(cast(size_t) value).array.join;
-				id += 1;
-			}
-			swaped = true;
+			newarr ~= to!string(id).repeat(cast(size_t) value).array.join;
+			id += 1;
 		}
 	}
 
 	char[] arr = newarr.dup;
-	//move right to left
-	foreach (l; 0 .. arr.length)
+	auto placementpointer = 0;
+	auto pickuppointer = arr.length - 1;
+
+	while (placementpointer < pickuppointer)
 	{
-		foreach_reverse(i, r;arr)
+		while (arr[placementpointer] != '.' && placementpointer < pickuppointer)
 		{
-			if (arr[l] == '.' && i>l)
-			{
-				arr[l] = r;
-				arr[i] = '.';
-				break;
-			}
+			placementpointer += 1;
+		}
+		while (arr[pickuppointer] == '.' && pickuppointer > placementpointer)
+		{
+
+			pickuppointer -= 1;
+		}
+		if (placementpointer == pickuppointer)
+		{
+			break;
+		}
+		auto blocktomove = arr[pickuppointer];
+		arr[pickuppointer] = '.';
+		pickuppointer -= 1;
+		arr[placementpointer] = blocktomove;
+	}
+
+	long checksum = 0;
+	foreach (i, c; arr)
+	{
+		if (c != '.')
+		{
+			int fileID = c - '0'; // Convert character digit to integer file ID
+			checksum += i * fileID;
 		}
 	}
 
- long checksum = 0;
-    foreach (i, c; arr)
-    {
-        if (c != '.')
-        {
-            int fileID = c - '0'; // Convert character digit to integer file ID
-            checksum += i * fileID;
-        }
-    }
+	writeln("Checksum: ", checksum);
 
-    writeln("Checksum: ", checksum);
-
-	//writeln(newarr);
-	//writeln(arr);
+	// writeln(newarr);
+	// writeln(arr);
 }
