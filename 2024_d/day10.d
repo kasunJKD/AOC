@@ -17,7 +17,7 @@ import std.traits;
 void main()
 {
 
-	auto grid = readfile("test10.txt");
+	auto grid = readfile("test.txt");
 
 	//left , right, down, up
 	int[2][] dir = [[0, -1], [0, 1], [-1, 0], [1, 0]];
@@ -27,9 +27,9 @@ void main()
 		return y >= 0 && x >= 0 && y < grid.length && x < grid[0].length;
 	}
 
-	bool findTrail(int y, int x, int currentHeight, bool[][] visited)
+	bool findTrail(int y, int x, int currentHeight, ref bool[][] visited)
 	{
-		if (grid[y][x] == 9) // Reached height 9
+		if (grid[y][x] == 9 && currentHeight == 9) // Reached height 9
 			return true;
 
 		visited[y][x] = true;
@@ -40,6 +40,9 @@ void main()
 			int nx = x + d[1];
 			if (inBounds(ny, nx) && !visited[ny][nx] && grid[ny][nx] == currentHeight + 1)
 			{
+				writeln("next", ny);
+				writeln("next", nx);
+				writeln("next val -", grid[ny][nx]);
 				if (findTrail(ny, nx, currentHeight + 1, visited))
 					return true;
 			}
@@ -61,19 +64,11 @@ void main()
 				bool[][] visited = new bool[][](to!int(grid.length), to!int(
 						grid[0].length));
 
-				foreach (d; dir)
-				{
-					int ny = y + d[0];
-					int nx = x + d[1];
-					if (inBounds(ny, nx) && grid[ny][nx] == 1)
-					{
-						visited = new bool[][](to!int(grid.length), to!int(
-								grid[0].length));
-						// Reset visited
-						if (findTrail(ny, nx, 1, visited))
-							trailScore++;
-					}
-				}
+				visited = new bool[][](to!int(grid.length), to!int(
+						grid[0].length));
+				// Reset visited
+				if (findTrail(y, x, 0, visited))
+					trailScore++;
 
 				totalScore += trailScore;
 			}
