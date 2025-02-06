@@ -23,53 +23,55 @@ void main()
 
 	auto gcd(int x, int y)
 	{
-		int v;
-		while (y != 0)
+		if (x == 0)
 		{
-			int temp = y;
-			y = x % y;
-			x = temp;
-			v = x;
+			return y;
+		}
+		else if (y == 0)
+		{
+			return x;
 		}
 
-		return v;
+		return gcd(y, x % y);
 	}
 
-	auto extended_eu(int A, int B)
+	auto extended_eu(int A, int B, int* x, int* y)
 	{
 		if (B == 0)
 		{
-			return tuple(1, 0); // Base case: gcd(A, 0) = A, so x = 1, y = 0
+			*y = 0;
+			*x = 1;
+			return A; // Base case: gcd(A, 0) = A, so x = 1, y = 0
 		}
-		auto vv = extended_eu(B, A % B); // Recursive call
-		int x1 = vv[0];
-		int y1 = vv[1];
+		int x1, y1;
+		auto vv = extended_eu(B, A % B, &x1, &y1); // Recursive call
 
-		int x = y1;
-		int y = x1 - (A / B) * y1; // Ensure correct integer division
+		*x = y1;
+		*y = x1 - (y1 * (A / B)); // Ensure correct integer division
 
-		return tuple(x, y);
+		return vv;
 	}
 
 	auto solver(int Ax, int Ay, int Bx, int By, int Px, int Py)
 	{
 		// Compute GCDs
-		auto gcd_x = gcd(Ax, Bx);
-		auto gcd_y = gcd(Ay, By);
-
-		// Check if a solution exists (Px and Py must be divisible by gcd_x and gcd_y)
-		if (Px % gcd_x != 0 || Py % gcd_y != 0)
-		{
-			return -1; // No solution exists
-		}
-
 		// Find particular solutions using Extended Euclidean Algorithm
-		auto v = extended_eu(Ax, Bx);
-		auto v1 = extended_eu(Ay, By);
-		int x0 = v[0]; // Solution for X direction
-		int y0 = v[1];
-		int a0 = v1[0]; // Solution for Y direction
-		int b0 = v1[1];
+		int x, y;
+		writeln("Ax ", Ax);
+		writeln("Bx ", Bx);
+		auto gcd_x = extended_eu(Ax, Bx, &x, &y);
+		writeln(x);
+		writeln(y);
+		int xx, yy;
+		writeln("Ay ", Ay);
+		writeln("By ", By);
+		auto gcd_y = extended_eu(Ay, By, &xx, &yy);
+		writeln(xx);
+		writeln(yy);
+		int x0 = x; // Solution for X direction
+		int y0 = y;
+		int a0 = xx; // Solution for Y direction
+		int b0 = yy;
 
 		// Scale solutions to match Px and Py
 		x0 *= (Px / gcd_x);
@@ -107,6 +109,7 @@ void main()
 		}
 
 		return bestCost;
+		//return -1;
 	}
 
 	int i = 0;
@@ -128,12 +131,6 @@ void main()
 		int Py = prizeData[2][2 .. $].to!int; // Remove "Y=" prefix
 
 		// Call the solver function for this claw machine
-		writeln(Ax);
-		writeln(Ay);
-		writeln(Bx);
-		writeln(By);
-		writeln(Px);
-		writeln(Py);
 		int result = solver(Ax, Ay, Bx, By, Px, Py);
 		{
 			writeln("Minimum cost to win the prize: ", result);
