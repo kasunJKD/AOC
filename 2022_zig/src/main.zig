@@ -1,6 +1,6 @@
 const std = @import("std");
-const mainapp = @import("day1.zig");
+const mainapp = @import("day3.zig");
 
 pub fn main() !void {
-    try mainapp.day1_2();
+    try mainapp.day3();
 }
